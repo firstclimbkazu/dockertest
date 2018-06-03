@@ -1,0 +1,44 @@
+version: '2.0'
+
+services:
+  nginx:
+    image: nginx
+    ports:
+        - '8880:80'
+    volumes:
+        - ./nginx:/etc/nginx
+        - ./logs/nginx:/var/log/nginx
+        - ./html:/var/www/html
+    links:
+        - rails
+    restart: always
+  mysql:
+    image: mariadb 
+    ports:
+        - '3306:3306'
+    volumes:
+        - ./db-data:/var/lib/mysql 
+    environment:
+        - MYSQL_ROOT_PASSWORD=pass
+    restart: always
+  rails:
+    build:
+        context: .
+        dockerfile: Dockerfile-alternate
+#    args:
+#        buildno: 1
+
+#    image: tcnksm/rbenv
+    ports:
+        - '9000:9000'
+    volumes:
+        - ./html:/var/www/html
+#    environment:
+#        WORDPRESS_DB_NAME: railsdb
+#        WORDPRESS_DB_HOST: mysql
+#        WORDPRESS_DB_PASSWORD: pass
+    links:
+        - mysql
+    depends_on:
+        - mysql
+    restart: always
